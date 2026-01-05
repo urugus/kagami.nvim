@@ -25,7 +25,7 @@ describe("kagami.renderer", function()
 
     it("should return renderer_cmd for complex command", function()
       local config = {
-        renderer_cmd = { "node", "--experimental-strip-types", "/path/to/custom.ts" },
+        renderer_cmd = { "npx", "tsx", "/path/to/custom.ts" },
       }
       local result = renderer.resolve_cmd(config)
 
@@ -40,9 +40,8 @@ describe("kagami.renderer", function()
       -- nil または テーブルのいずれか
       if result then
         assert.is_table(result)
-        assert.equals("node", result[1])
-        assert.equals("--experimental-strip-types", result[2])
-        assert.is_true(result[3]:match("kagami%-render%.ts$") ~= nil)
+        assert.is_true(result[1]:match("tsx") ~= nil)
+        assert.is_true(result[2]:match("kagami%-render%.ts$") ~= nil)
       end
     end)
 
