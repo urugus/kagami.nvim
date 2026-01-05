@@ -1,0 +1,157 @@
+*kagami.txt*  Markdown preview rendered in Neovim
+
+==============================================================================
+Contents                                                        *kagami-contents*
+
+  1. Overview .................................................. |kagami|
+  2. Installation .............................................. |kagami-install|
+  3. Setup ..................................................... |kagami-setup|
+  4. Commands .................................................. |kagami-commands|
+  5. Lua API ................................................... |kagami-api|
+  6. Options ................................................... |kagami-options|
+  7. Troubleshooting ........................................... |kagami-troubleshooting|
+
+==============================================================================
+1. Overview                                                               *kagami*
+
+kagami.nvim is a plugin that previews Markdown in a right-hand split inside
+Neovim. It starts an external renderer (bundled TypeScript/Ink) inside Neovim's
+`:terminal` and updates it by sending JSONL containing the buffer content and
+view position.
+
+Notes:
+  - This is currently an MVP. Scroll following is an approximation of
+    "source line -> preview line" at 1:1.
+  - Sixel rendering depends on your terminal/environment (Neovim `:terminal`
+    may not support it).
+
+==============================================================================
+2. Installation                                                   *kagami-install*
+
+Node.js is required to run the external renderer. Example for local development:
+
+  - Install renderer dependencies:
+        `cd renderer && npm i`
+
+lazy.nvim example:
+>
+  {
+    dir = "/path/to/kagami.nvim",
+    opts = {},
+  }
+<
+
+Generate helptags (if needed):
+  :helptags ALL
+
+==============================================================================
+3. Setup                                                            *kagami-setup*
+
+Configure with `require("kagami").setup()`:
+>
+  require("kagami").setup({
+    debounce_ms = 60,
+    follow_scroll = true,
+    follow_cursor = true,
+    filetypes = { "markdown", "md", "pandoc" },
+    renderer_cmd = nil,
+    mode = "ansi",
+  })
+<
+
+==============================================================================
+4. Commands                                                        *kagami-commands*
+
+                                                                *:KagamiOpen*
+:KagamiOpen
+  Open the preview on the right, using the current buffer as the source.
+
+                                                               *:KagamiClose*
+:KagamiClose
+  Close the preview.
+
+                                                              *:KagamiToggle*
+:KagamiToggle
+  Toggle the preview.
+
+                                                             *:KagamiRefresh*
+:KagamiRefresh
+  Re-render immediately.
+
+==============================================================================
+5. Lua API                                                           *kagami-api*
+
+`require("kagami")` exports the following functions:
+
+  - `setup(opts)`   Apply configuration.
+  - `open()`        Open the preview.
+  - `close()`       Close the preview.
+  - `toggle()`      Toggle the preview.
+  - `refresh()`     Re-render.
+
+==============================================================================
+6. Options                                                         *kagami-options*
+
+These are the `opts` for `setup()` (defaults in parentheses):
+
+                                                        *kagami-options-debounce_ms*
+debounce_ms (60)
+  Debounce time (ms) from change detection to rendering.
+
+                                                        *kagami-options-follow_scroll*
+follow_scroll (true)
+  Reflect the source scroll position in the preview (approximate).
+
+                                                        *kagami-options-follow_cursor*
+follow_cursor (true)
+  Reflect the source cursor position in the preview (approximate).
+
+                                                        *kagami-options-filetypes*
+filetypes ({ "markdown", "md", "pandoc" })
+  List of filetypes considered Markdown. The plugin still runs for other
+  filetypes, but it will warn.
+
+                                                        *kagami-options-renderer_cmd*
+renderer_cmd (nil)
+  External renderer command as a list.
+  Example: `{ "node", "--experimental-strip-types", "/abs/path/to/kagami-render.ts" }`
+
+  When `nil`, it looks up `renderer/kagami-render.ts` on runtimepath and runs it.
+
+                                                        *kagami-options-mode*
+mode ("ansi")
+  Renderer mode: `"ansi"` or `"sixel"`.
+
+                                                        *kagami-options-mermaid*
+mermaid ({ enabled = true, mmdc = nil, rows = nil })
+  Mermaid 画像化の設定（sixel モード時のみ）。
+
+  enabled (true)
+    `true` の場合、プレビュー中の ```mermaid フェンスブロックを `mmdc` でSVG化し、
+    ImageMagick (`magick`) で sixel に変換して表示します。
+
+  mmdc (nil)
+    `mmdc` の実行ファイルパス。`nil` の場合、`$PATH` と `renderer/node_modules/.bin/mmdc`
+    を順に試します。
+
+  rows (nil)
+    図の最大行数（高さ）を指定します。`nil` の場合は内容から推定します。
+
+==============================================================================
+7. Troubleshooting                                          *kagami-troubleshooting*
+
+The preview does not open:
+  - If you set `renderer_cmd`, verify the command/path is correct.
+  - If `renderer_cmd = nil`, `renderer/kagami-render.ts` must be on runtimepath
+    (verify the plugin is loaded correctly).
+
+Sixel does not render:
+  - Some environments cannot render Sixel in Neovim `:terminal` (libvterm).
+    Use `mode = "ansi"` in that case.
+
+Quick smoke test:
+  - In a Markdown buffer, run `:KagamiOpen`, then edit/scroll to verify updates.
+
+==============================================================================
+
+vim:tw=78:ts=8:noet:ft=help:norl:
