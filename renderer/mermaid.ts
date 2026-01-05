@@ -1,9 +1,9 @@
 import { spawn } from "node:child_process";
+import crypto from "node:crypto";
 import { access, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import crypto from "node:crypto";
 
 type RunResult = { code: number | null; stdout: string; stderr: string };
 
@@ -70,7 +70,12 @@ export const renderSixelFromMermaid = async (
   const requestedRows = process.env.KAGAMI_MERMAID_ROWS;
   const rows = Math.max(
     1,
-    Math.min(maxRows, requestedRows ? coerceEnvNumber(requestedRows, estimateRows(code, maxRows)) : estimateRows(code, maxRows))
+    Math.min(
+      maxRows,
+      requestedRows
+        ? coerceEnvNumber(requestedRows, estimateRows(code, maxRows))
+        : estimateRows(code, maxRows)
+    )
   );
 
   const font = process.env.KAGAMI_FONT || "Menlo";
@@ -92,7 +97,16 @@ export const renderSixelFromMermaid = async (
   try {
     await writeFile(inFile, `${code}\n`, "utf8");
 
-    const mmdcRes = await run(mmdc, ["-i", inFile, "-o", outFile, "-t", "dark", "-b", "transparent"]);
+    const mmdcRes = await run(mmdc, [
+      "-i",
+      inFile,
+      "-o",
+      outFile,
+      "-t",
+      "dark",
+      "-b",
+      "transparent",
+    ]);
     if (mmdcRes.code !== 0) {
       const msg = (mmdcRes.stderr || mmdcRes.stdout || "mmdc failed").trim();
       return { sixel: null, error: msg };
@@ -123,4 +137,3 @@ export const renderSixelFromMermaid = async (
     await rm(dir, { recursive: true, force: true });
   }
 };
-
