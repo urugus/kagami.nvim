@@ -11,7 +11,7 @@ npm i
 ## 手動起動（デバッグ）
 
 ```sh
-node --experimental-strip-types kagami-render.ts
+npx tsx kagami-render.ts
 ```
 
 stdin に JSONL を流すと更新します。

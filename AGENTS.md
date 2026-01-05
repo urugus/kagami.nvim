@@ -15,7 +15,7 @@ Renderer setup and checks (requires Node.js):
 - `cd renderer && npm i`: Install renderer dependencies (Ink, Biome, types).
 - `cd renderer && npm run check`: Run Biome lint + format checks.
 - `cd renderer && npm run format`: Auto-format TS sources with Biome.
-- `node --experimental-strip-types renderer/kagami-render.ts`: Run the renderer directly (reads JSONL from stdin).
+- `cd renderer && npx tsx kagami-render.ts`: Run the renderer directly (reads JSONL from stdin).
 
 Manual Neovim smoke test (no user config):
 

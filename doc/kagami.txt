@@ -114,7 +114,7 @@ filetypes ({ "markdown", "md", "pandoc" })
                                                         *kagami-options-renderer_cmd*
 renderer_cmd (nil)
   External renderer command as a list.
-  Example: `{ "node", "--experimental-strip-types", "/abs/path/to/kagami-render.ts" }`
+  Example: `{ "/abs/path/to/renderer/node_modules/.bin/tsx", "/abs/path/to/kagami-render.ts" }`
 
   When `nil`, it looks up `renderer/kagami-render.ts` on runtimepath and runs it.
 

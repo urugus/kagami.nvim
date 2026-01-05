@@ -11,7 +11,7 @@ environment (Neovim `:terminal` may not render it).
 ## Requirements
 
 - Neovim 0.9+ (0.10+ recommended)
-- Node.js (must support `node --experimental-strip-types`)
+- Node.js (npm included)
 - A terminal that can display ANSI output (Sixel is optional / environment-dependent)
 
 ## Install
@@ -65,7 +65,7 @@ require("kagami").setup({
   debounce_ms = 60,
   follow_scroll = true,
   follow_cursor = true,
-  renderer_cmd = nil, -- when nil, runs the bundled renderer/kagami-render.ts via node
+  renderer_cmd = nil, -- when nil, runs the bundled renderer/kagami-render.ts via tsx
   mode = "ansi", -- "ansi" | "sixel"
   mermaid = {
     enabled = true, -- sixel mode で ```mermaid を画像化（mmdc が必要）
@@ -79,11 +79,11 @@ require("kagami").setup({
 ### renderer_cmd examples
 
 By default, kagami.nvim resolves `renderer/kagami-render.ts` from your runtimepath
-and runs it with Node. If you want to use a custom renderer command:
+and runs it with `tsx` from `renderer/node_modules/`. If you want to use a custom renderer command:
 
 ```lua
 require("kagami").setup({
-  renderer_cmd = { "node", "--experimental-strip-types", "/abs/path/to/kagami-render.ts" },
+  renderer_cmd = { "/abs/path/to/renderer/node_modules/.bin/tsx", "/abs/path/to/kagami-render.ts" },
 })
 ```
 
@@ -110,7 +110,7 @@ After generating helptags (e.g. `:helptags ALL`), see `:help kagami`.
   - If `renderer_cmd = nil`, the plugin must be installed as a full runtime directory
     so that `renderer/kagami-render.ts` exists on runtimepath.
 - The preview opens but stays blank
-  - Check `:messages` for errors from `node` or the renderer process.
+  - Check `:messages` for errors from `tsx` or the renderer process.
   - Try `:KagamiRefresh`.
 - Sixel does not render
   - Use `mode = "ansi"` unless you know your Neovim+terminal environment supports Sixel.
