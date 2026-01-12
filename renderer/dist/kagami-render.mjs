@@ -88380,13 +88380,23 @@ var renderSixelFromText = async (text, cols, rows) => {
 };
 
 // terminal.ts
+var isPlain = process.env.KAGAMI_PLAIN === "1";
+var FRAME_END_MARKER = "\0KAGAMI_FRAME_END\0";
 var clearScreen2 = () => {
+  if (isPlain) return;
   process.stdout.write("\x1B[2J\x1B[H");
 };
 var printLines = (lines) => {
-  process.stdout.write(lines.join("\n"));
-  if (lines.length === 0 || lines[lines.length - 1] !== "") {
+  const output = isPlain ? lines.map((l) => stripAnsi(l)) : lines;
+  process.stdout.write(output.join("\n"));
+  if (output.length === 0 || output[output.length - 1] !== "") {
     process.stdout.write("\n");
+  }
+};
+var printFrameEnd = () => {
+  if (isPlain) {
+    process.stdout.write(`${FRAME_END_MARKER}
+`);
   }
 };
 
@@ -88467,6 +88477,7 @@ ${error || "unknown error"}`,
   }
   clearScreen2();
   printLines(visible);
+  printFrameEnd();
 };
 var pending = "";
 var scheduleDraw = async () => {

@@ -3,7 +3,7 @@ import { createInk } from "./ink.tsx";
 import { renderSixelFromMermaid } from "./mermaid.ts";
 import { type State, coerceState, defaultState, isRenderMsg } from "./protocol.ts";
 import { renderSixelFromText } from "./sixel.ts";
-import { clearScreen, printLines } from "./terminal.ts";
+import { clearScreen, printFrameEnd, printLines } from "./terminal.ts";
 
 let state: State = defaultState;
 
@@ -96,6 +96,7 @@ const draw = async () => {
 
   clearScreen();
   printLines(visible);
+  printFrameEnd();
 };
 
 let pending = "";
