@@ -3,7 +3,7 @@ node_modules/
 npm-debug.log*
 
 # Build output
-renderer/dist/
+# renderer/dist/ is committed for user convenience (no build step required)
 
 # macOS
 .DS_Store
