@@ -5,6 +5,7 @@
   "version": "0.0.0",
   "license": "UNLICENSED",
   "scripts": {
+    "build": "esbuild kagami-render.ts --bundle --platform=node --format=esm --outfile=dist/kagami-render.mjs --external:yoga-layout --define:process.env.NODE_ENV='\"production\"' --banner:js=\"import{createRequire}from'module';const require=createRequire(import.meta.url);\"",
     "lint": "biome lint .",
     "format": "biome format --write .",
     "check": "biome check .",
@@ -13,8 +14,10 @@
   },
   "dependencies": {
     "ink": "^5.0.0",
-    "ink-markdown": "^1.0.0",
+    "marked": "^15.0.0",
+    "marked-terminal": "^7.0.0",
     "react": "^18.3.0",
+    "react-devtools-core": "^4.19.1",
     "slice-ansi": "^7.1.0",
     "string-width": "^7.2.0",
     "strip-ansi": "^7.1.0"
