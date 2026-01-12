@@ -1,17 +1,26 @@
 import { Box, Text } from "ink";
-import InkMarkdown from "ink-markdown";
-import React from "react";
+import { Marked } from "marked";
+import { markedTerminal } from "marked-terminal";
+import React, { useMemo } from "react";
 
-export const App = ({ markdown }: { markdown: string }) => (
-  <Box flexDirection="column">
-    <Box>
-      <Text dimColor>Kagami</Text>
-      <Text dimColor> </Text>
-      <Text dimColor>(Ink preview)</Text>
-    </Box>
+const marked = new Marked(markedTerminal());
+
+export const App = ({ markdown }: { markdown: string }) => {
+  const rendered = useMemo(() => {
+    if (!markdown) return "";
+    return marked.parse(markdown, { async: false }) as string;
+  }, [markdown]);
+
+  return (
     <Box flexDirection="column">
-      {/* @ts-expect-error ink-markdown lacks proper type definitions */}
-      <InkMarkdown>{markdown}</InkMarkdown>
+      <Box>
+        <Text dimColor>Kagami</Text>
+        <Text dimColor> </Text>
+        <Text dimColor>(Ink preview)</Text>
+      </Box>
+      <Box flexDirection="column">
+        <Text>{rendered}</Text>
+      </Box>
     </Box>
-  </Box>
-);
+  );
+};

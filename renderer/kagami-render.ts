@@ -32,12 +32,13 @@ const draw = async () => {
 
   rerender(state.markdown);
 
-  // Ink が lastFrame を更新するのを待つ
-  await Promise.resolve();
-  await Promise.resolve();
+  // Ink が stdout に出力するのを待つ（複数回のイベントループを待機）
+  for (let i = 0; i < 10; i++) {
+    await new Promise((r) => setImmediate(r));
+  }
+  await new Promise((r) => setTimeout(r, 50));
 
-  // @ts-expect-error lastFrame exists but is not in type definition
-  const frame = (ink.lastFrame() as string) || "";
+  const frame = stdout.getOutput() || "";
   const frameLines = frame.split("\n");
   const scrollTop = getScrollTop(height);
 

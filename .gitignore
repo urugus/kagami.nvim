@@ -2,6 +2,9 @@
 node_modules/
 npm-debug.log*
 
+# Build output
+renderer/dist/
+
 # macOS
 .DS_Store
 
