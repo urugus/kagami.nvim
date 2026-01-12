@@ -55,14 +55,14 @@ describe("kagami.renderer", function()
     end)
   end)
 
-  describe("termopen", function()
-    it("should call vim.fn.termopen with correct arguments", function()
-      -- termopen をモックして呼び出しを検証
+  describe("jobstart", function()
+    it("should call vim.fn.jobstart with correct arguments", function()
+      -- jobstart をモックして呼び出しを検証
       local called_cmd = nil
       local called_opts = nil
-      local original_termopen = vim.fn.termopen
+      local original_jobstart = vim.fn.jobstart
 
-      vim.fn.termopen = function(cmd, opts)
+      vim.fn.jobstart = function(cmd, opts)
         called_cmd = cmd
         called_opts = opts
         return -1 -- ダミーのチャネルID
@@ -70,27 +70,31 @@ describe("kagami.renderer", function()
 
       local cmd = { "echo", "test" }
       local env = { KAGAMI = "1", KAGAMI_MODE = "ansi" }
+      local on_stdout = function() end
       local on_exit = function() end
 
-      renderer.termopen(cmd, env, on_exit)
+      renderer.jobstart(cmd, env, on_stdout, on_exit)
 
-      vim.fn.termopen = original_termopen
+      vim.fn.jobstart = original_jobstart
 
       assert.same(cmd, called_cmd)
       assert.same(env, called_opts.env)
+      assert.equals(false, called_opts.pty)
+      assert.equals(on_stdout, called_opts.on_stdout)
+      assert.equals(on_stdout, called_opts.on_stderr)
       assert.equals(on_exit, called_opts.on_exit)
     end)
 
-    it("should return channel id from termopen", function()
-      local original_termopen = vim.fn.termopen
+    it("should return channel id from jobstart", function()
+      local original_jobstart = vim.fn.jobstart
 
-      vim.fn.termopen = function()
+      vim.fn.jobstart = function()
         return 12345
       end
 
-      local result = renderer.termopen({ "echo" }, {}, function() end)
+      local result = renderer.jobstart({ "echo" }, {}, function() end, function() end)
 
-      vim.fn.termopen = original_termopen
+      vim.fn.jobstart = original_jobstart
 
       assert.equals(12345, result)
     end)
@@ -125,7 +129,7 @@ describe("kagami.renderer", function()
       vim.api.nvim_set_current_buf(buf)
 
       local exited = false
-      local chan = renderer.termopen(cmd, { KAGAMI = "1", KAGAMI_MODE = "ansi" }, function()
+      local chan = renderer.jobstart(cmd, { KAGAMI = "1", KAGAMI_MODE = "ansi" }, function() end, function()
         exited = true
       end)
 

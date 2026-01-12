@@ -117,11 +117,11 @@ describe("kagami", function()
     end)
 
     it("should not open twice", function()
-      -- termopen をモックして実際のプロセスを起動しない
-      local original_termopen = vim.fn.termopen
-      local termopen_count = 0
-      vim.fn.termopen = function()
-        termopen_count = termopen_count + 1
+      -- jobstart をモックして実際のプロセスを起動しない
+      local original_jobstart = vim.fn.jobstart
+      local jobstart_count = 0
+      vim.fn.jobstart = function()
+        jobstart_count = jobstart_count + 1
         return 1
       end
 
@@ -134,15 +134,15 @@ describe("kagami", function()
       kagami.open()
       kagami.open() -- 2回目
 
-      vim.fn.termopen = original_termopen
+      vim.fn.jobstart = original_jobstart
 
       -- 1回しか呼ばれていない
-      assert.equals(1, termopen_count)
+      assert.equals(1, jobstart_count)
     end)
 
     it("should set state when opened successfully", function()
-      local original_termopen = vim.fn.termopen
-      vim.fn.termopen = function()
+      local original_jobstart = vim.fn.jobstart
+      vim.fn.jobstart = function()
         return 1
       end
 
@@ -153,7 +153,7 @@ describe("kagami", function()
       kagami.setup({ renderer_cmd = { "echo" } })
       kagami.open()
 
-      vim.fn.termopen = original_termopen
+      vim.fn.jobstart = original_jobstart
 
       assert.is_table(kagami._state)
       assert.equals(buf, kagami._state.source_buf)
@@ -171,8 +171,8 @@ describe("kagami", function()
     end)
 
     it("should clear state when closed", function()
-      local original_termopen = vim.fn.termopen
-      vim.fn.termopen = function()
+      local original_jobstart = vim.fn.jobstart
+      vim.fn.jobstart = function()
         return 1
       end
 
@@ -184,14 +184,14 @@ describe("kagami", function()
       kagami.open()
       kagami.close()
 
-      vim.fn.termopen = original_termopen
+      vim.fn.jobstart = original_jobstart
 
       assert.is_nil(kagami._state)
     end)
 
     it("should close preview window", function()
-      local original_termopen = vim.fn.termopen
-      vim.fn.termopen = function()
+      local original_jobstart = vim.fn.jobstart
+      vim.fn.jobstart = function()
         return 1
       end
 
@@ -205,7 +205,7 @@ describe("kagami", function()
       local preview_win = kagami._state.preview_win
       kagami.close()
 
-      vim.fn.termopen = original_termopen
+      vim.fn.jobstart = original_jobstart
 
       assert.is_false(vim.api.nvim_win_is_valid(preview_win))
     end)
@@ -213,8 +213,8 @@ describe("kagami", function()
 
   describe("toggle", function()
     it("should open when closed", function()
-      local original_termopen = vim.fn.termopen
-      vim.fn.termopen = function()
+      local original_jobstart = vim.fn.jobstart
+      vim.fn.jobstart = function()
         return 1
       end
 
@@ -225,14 +225,14 @@ describe("kagami", function()
       kagami.setup({ renderer_cmd = { "echo" } })
       kagami.toggle()
 
-      vim.fn.termopen = original_termopen
+      vim.fn.jobstart = original_jobstart
 
       assert.is_table(kagami._state)
     end)
 
     it("should close when opened", function()
-      local original_termopen = vim.fn.termopen
-      vim.fn.termopen = function()
+      local original_jobstart = vim.fn.jobstart
+      vim.fn.jobstart = function()
         return 1
       end
 
@@ -244,7 +244,7 @@ describe("kagami", function()
       kagami.toggle() -- open
       kagami.toggle() -- close
 
-      vim.fn.termopen = original_termopen
+      vim.fn.jobstart = original_jobstart
 
       assert.is_nil(kagami._state)
     end)
