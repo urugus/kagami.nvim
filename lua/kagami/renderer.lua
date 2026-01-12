@@ -14,9 +14,12 @@ function M.resolve_cmd(config)
   return config.renderer_cmd or default_renderer_cmd()
 end
 
-function M.termopen(cmd, env, on_exit)
-  return vim.fn.termopen(cmd, {
+function M.jobstart(cmd, env, on_stdout, on_exit)
+  return vim.fn.jobstart(cmd, {
     env = env,
+    pty = false,
+    on_stdout = on_stdout,
+    on_stderr = on_stdout,
     on_exit = on_exit,
   })
 end

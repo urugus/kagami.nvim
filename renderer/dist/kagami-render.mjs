@@ -88380,7 +88380,9 @@ var renderSixelFromText = async (text, cols, rows) => {
 };
 
 // terminal.ts
+var isPlain = process.env.KAGAMI_PLAIN === "1";
 var clearScreen2 = () => {
+  if (isPlain) return;
   process.stdout.write("\x1B[2J\x1B[H");
 };
 var printLines = (lines) => {
