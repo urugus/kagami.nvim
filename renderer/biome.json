@@ -1,4 +1,7 @@
 {
+  "files": {
+    "ignore": ["dist/**"]
+  },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",

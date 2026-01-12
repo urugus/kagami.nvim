@@ -40,8 +40,8 @@ describe("kagami.renderer", function()
       -- nil または テーブルのいずれか
       if result then
         assert.is_table(result)
-        assert.is_true(result[1]:match("tsx") ~= nil)
-        assert.is_true(result[2]:match("kagami%-render%.ts$") ~= nil)
+        assert.is_true(result[1]:match("node") ~= nil)
+        assert.is_true(result[2]:match("kagami%-render%.mjs$") ~= nil)
       end
     end)
 
@@ -100,11 +100,11 @@ describe("kagami.renderer", function()
   describe("smoke test", function()
     it("should find renderer in runtimepath", function()
       -- プラグインディレクトリが runtimepath に含まれている場合
-      local files = vim.api.nvim_get_runtime_file("renderer/kagami-render.ts", false)
+      local files = vim.api.nvim_get_runtime_file("renderer/dist/kagami-render.mjs", false)
 
       -- テスト環境では見つかるはず
       if #files > 0 then
-        assert.is_true(files[1]:match("kagami%-render%.ts$") ~= nil)
+        assert.is_true(files[1]:match("kagami%-render%.mjs$") ~= nil)
       end
     end)
 
