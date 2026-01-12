@@ -31,6 +31,8 @@ local function render_now()
   sync.render_now(M._state, M._config, cleanup)
 end
 
+local FRAME_END_MARKER = "\0KAGAMI_FRAME_END\0"
+
 local function on_stdout(_, data, _)
   if not M._state then
     return
@@ -40,29 +42,35 @@ local function on_stdout(_, data, _)
     return
   end
 
-  local lines = {}
-  for _, line in ipairs(data) do
-    table.insert(lines, line)
-  end
-  if #lines == 0 then
-    return
-  end
-  -- 最後の空行を除去（ストリーミング出力のため）
-  if lines[#lines] == "" then
-    table.remove(lines)
-  end
-  if #lines == 0 then
-    return
-  end
+  -- 蓄積バッファを初期化
+  M._state.stdout_buffer = M._state.stdout_buffer or {}
 
-  vim.schedule(function()
-    if not (preview_buf and vim.api.nvim_buf_is_valid(preview_buf)) then
-      return
+  -- チャンクを蓄積
+  for _, line in ipairs(data) do
+    -- フレーム終了マーカーを検出
+    if line == FRAME_END_MARKER then
+      -- 蓄積した行をバッファに設定
+      local lines = M._state.stdout_buffer
+      -- 末尾の空行を除去
+      while #lines > 0 and lines[#lines] == "" do
+        table.remove(lines)
+      end
+      if #lines > 0 then
+        vim.schedule(function()
+          if not (preview_buf and vim.api.nvim_buf_is_valid(preview_buf)) then
+            return
+          end
+          vim.bo[preview_buf].modifiable = true
+          vim.api.nvim_buf_set_lines(preview_buf, 0, -1, false, lines)
+          vim.bo[preview_buf].modifiable = false
+        end)
+      end
+      -- バッファをクリア
+      M._state.stdout_buffer = {}
+    else
+      table.insert(M._state.stdout_buffer, line)
     end
-    vim.bo[preview_buf].modifiable = true
-    vim.api.nvim_buf_set_lines(preview_buf, 0, -1, false, lines)
-    vim.bo[preview_buf].modifiable = false
-  end)
+  end
 end
 
 local function schedule_render()
