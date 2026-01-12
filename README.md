@@ -16,33 +16,20 @@ environment (Neovim `:terminal` may not render it).
 
 ## Install
 
-This repository includes a bundled renderer under `renderer/`. You must install
-its dependencies for the preview to work.
+This repository includes a pre-built renderer under `renderer/dist/`.
 
 ### lazy.nvim
 
 ```lua
 {
   "urugus/kagami.nvim",
-  -- The renderer is started via Neovim `:terminal`, so install its deps at install time.
-  build = "cd renderer && npm i",
   opts = {},
 }
 ```
 
-If you prefer to manage Node/npm yourself, omit `build` and run it manually once:
-`cd renderer && npm i`
-
 ### Local development (dir)
 
-1. Install renderer dependencies in `renderer/`:
-
-   ```sh
-   cd renderer
-   npm i
-   ```
-
-2. Load the plugin in Neovim (lazy.nvim example):
+1. Load the plugin in Neovim (lazy.nvim example):
 
    ```lua
    {
@@ -51,7 +38,9 @@ If you prefer to manage Node/npm yourself, omit `build` and run it manually once
    }
    ```
 
-3. In a Markdown buffer, run `:KagamiOpen`.
+2. In a Markdown buffer, run `:KagamiOpen`.
+
+For renderer development (TypeScript), run `cd renderer && npm i` first.
 
 ## Commands
 
@@ -65,7 +54,7 @@ require("kagami").setup({
   debounce_ms = 60,
   follow_scroll = true,
   follow_cursor = true,
-  renderer_cmd = nil, -- when nil, runs the bundled renderer/kagami-render.ts via tsx
+  renderer_cmd = nil, -- when nil, runs the bundled renderer/dist/kagami-render.mjs via node
   mode = "ansi", -- "ansi" | "sixel"
   mermaid = {
     enabled = true, -- sixel mode で ```mermaid を画像化（mmdc が必要）
@@ -78,12 +67,12 @@ require("kagami").setup({
 
 ### renderer_cmd examples
 
-By default, kagami.nvim resolves `renderer/kagami-render.ts` from your runtimepath
-and runs it with `tsx` from `renderer/node_modules/`. If you want to use a custom renderer command:
+By default, kagami.nvim resolves `renderer/dist/kagami-render.mjs` from your runtimepath
+and runs it with `node`. If you want to use a custom renderer command:
 
 ```lua
 require("kagami").setup({
-  renderer_cmd = { "/abs/path/to/renderer/node_modules/.bin/tsx", "/abs/path/to/kagami-render.ts" },
+  renderer_cmd = { "node", "/abs/path/to/kagami-render.mjs" },
 })
 ```
 
@@ -105,17 +94,15 @@ After generating helptags (e.g. `:helptags ALL`), see `:help kagami`.
 ## Troubleshooting
 
 - `Kagami: renderer_cmd could not be resolved`
-  - Ensure you ran `cd renderer && npm i`.
   - If you set `renderer_cmd`, verify the command/path is correct.
   - If `renderer_cmd = nil`, the plugin must be installed as a full runtime directory
-    so that `renderer/kagami-render.ts` exists on runtimepath.
+    so that `renderer/dist/kagami-render.mjs` exists on runtimepath.
 - The preview opens but stays blank
-  - Check `:messages` for errors from `tsx` or the renderer process.
+  - Check `:messages` for errors from the renderer process.
   - Try `:KagamiRefresh`.
 - Sixel does not render
   - Use `mode = "ansi"` unless you know your Neovim+terminal environment supports Sixel.
 
 ## Uninstall
 
-Remove the plugin from your plugin manager. If you used the bundled renderer,
-you can also delete `renderer/node_modules/` to reclaim disk space.
+Remove the plugin from your plugin manager.
